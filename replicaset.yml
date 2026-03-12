@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: harsh-frontend
+  labels:
+spec:
+  # modify replicas according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+        apptype: backend
+        environment: qa
+  template:
+    metadata:
+      labels:
+        apptype: backend
+        environment: qa
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
