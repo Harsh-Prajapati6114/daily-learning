@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    tools {
+        maven 'Maven3'
+        jdk 'JAVA21'
+    }
+    stages {
+        stage('download from github') {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Harsh-Prajapati6114/maven-jenkins10.git']])
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('generate artifact') {
+            steps {
+                archiveArtifacts artifacts: '**/*.war', followSymlinks: false
+            }
+        }
+        stage('build deploy-pipeline') {
+            steps {
+                build wait: false, job: 'deploy-pipeline'
+            }
+        }
+        stage('copy artifact') {
+            steps {
+                copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: 'build-pipeline', selector: lastSuccessful()
+            }
+        }
+        stage('deploy') {
+            steps {
+                deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: 'deployCreds', path: '', url: 'http://34.30.41.125:8080/')], contextPath: null, war: '**/*.war'
+            }
+        }        
+    }
+}
+
+// pipeline {
+//     agent any
+//     stages {
+
+    
