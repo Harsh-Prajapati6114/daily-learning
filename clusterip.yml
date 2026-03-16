@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: harsh-service
+spec:
+  selector:
+    apptype: backend
+    environment: qa
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9376
